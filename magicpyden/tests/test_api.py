@@ -1,5 +1,6 @@
 import asyncio
 from asyncio import sleep
+from gc import collect
 
 import pytest
 from pytest_asyncio import fixture
@@ -104,3 +105,11 @@ async def test_get_wallet_escrow_balance(fixture_api: MagicEdenApi):
 
     await sleep(0)
     assert isinstance(wallet_ecsrow, EscrowBalance)
+
+
+@pytest.mark.asyncio
+async def test_get_collections(fixture_api: MagicEdenApi):
+    collections = await fixture_api.get_collections()
+
+    await sleep(0)
+    assert isinstance(collections, list)

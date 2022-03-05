@@ -3,6 +3,8 @@ from typing import Any, List
 from aiohttp import ClientResponse, ClientSession
 
 from magicpyden.schema import (
+    CollectionItem,
+    Collections,
     EscrowBalance,
     TokenListingItem,
     TokenListings,
@@ -174,3 +176,19 @@ class MagicEdenApi:
         """
         data = await self._request(route=f"wallets/{wallet_address}/escrow_balance")
         return EscrowBalance(**data)
+
+    async def get_collections(
+        self, offset: int = 0, limit: int = 200
+    ) -> List[CollectionItem]:
+        """
+        Retrieves collections
+        :param offset: The number of items to skip
+        :param limit: The number of items to return. Max 500
+        :return: Available collections on Magic Eden
+        """
+        kwargs = {
+            "offset": offset,
+            "limit": limit,
+        }
+        data = await self._request(route=f"collections", **kwargs)
+        return Collections.parse_obj(data).__root__

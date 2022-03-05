@@ -143,3 +143,18 @@ class WalletOffersReceived(BaseModel):
 class EscrowBalance(BaseModel):
     buyer_escrow: str
     balance: float
+
+
+class CollectionItem(BaseModel):
+    symbol: str
+    name: str
+    description: str
+    image: str
+    twitter: Optional[str] = None
+    discord: Optional[str] = None
+    website: Optional[str] = None
+    categories: List[str]
+
+
+class Collections(BaseModel):
+    __root__: List[CollectionItem]
