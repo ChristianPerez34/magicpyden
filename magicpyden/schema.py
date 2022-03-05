@@ -37,6 +37,11 @@ class TokenMetadata(BaseModel):
     external_url: str = Field(..., alias="externalUrl")
     attributes: List[Attribute]
     properties: Properties
+    delegate: Optional[str] = None
+
+
+class Tokens(BaseModel):
+    __root__: List[TokenMetadata]
 
 
 class TokenListingItem(BaseModel):
@@ -85,3 +90,56 @@ class TokenActivityItem(BaseModel):
 
 class TokenActivities(BaseModel):
     __root__: List[TokenActivityItem]
+
+
+class WalletActivityItem(BaseModel):
+    signature: str
+    type: str
+    source: str
+    token_mint: str = Field(..., alias="tokenMint")
+    collection: str
+    slot: int
+    block_time: int = Field(..., alias="blockTime")
+    buyer: str
+    buyer_referral: str = Field(..., alias="buyerReferral")
+    seller: str
+    seller_referral: str = Field(..., alias="sellerReferral")
+    price: float
+
+
+class WalletActivities(BaseModel):
+    __root__: List[WalletActivityItem]
+
+
+class WalletOfferMadeItem(BaseModel):
+    pda_address: str = Field(..., alias="pdaAddress")
+    token_mint: str = Field(..., alias="tokenMint")
+    auction_house: str = Field(..., alias="auctionHouse")
+    buyer: str
+    price: float
+    token_size: int = Field(..., alias="tokenSize")
+    expiry: int
+    buyer_referral: Optional[str] = Field(None, alias="buyerReferral")
+
+
+class WalletOffersMade(BaseModel):
+    __root__: List[WalletOfferMadeItem]
+
+
+class WalletOfferReceivedItem(BaseModel):
+    pda_address: str = Field(..., alias="pdaAddress")
+    token_mint: str = Field(..., alias="tokenMint")
+    auction_house: str = Field(..., alias="auctionHouse")
+    buyer: str
+    price: int
+    token_size: int = Field(..., alias="tokenSize")
+    expiry: int
+
+
+class WalletOffersReceived(BaseModel):
+    __root__: List[WalletOfferReceivedItem]
+
+
+class EscrowBalance(BaseModel):
+    buyer_escrow: str
+    balance: float

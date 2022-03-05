@@ -3,6 +3,7 @@ from typing import Any, List
 from aiohttp import ClientResponse, ClientSession
 
 from magicpyden.schema import (
+    EscrowBalance,
     TokenListingItem,
     TokenListings,
     TokenMetadata,
@@ -10,6 +11,13 @@ from magicpyden.schema import (
     TokenOffersReceived,
     TokenActivityItem,
     TokenActivities,
+    Tokens,
+    WalletActivityItem,
+    WalletActivities,
+    WalletOfferMadeItem,
+    WalletOfferReceivedItem,
+    WalletOffersMade,
+    WalletOffersReceived,
 )
 
 
@@ -77,3 +85,92 @@ class MagicEdenApi:
         kwargs = {"offset": offset, "limit": limit}
         data = await self._request(route=f"tokens/{token_mint}/activities", **kwargs)
         return TokenActivities.parse_obj(data).__root__
+
+    async def get_wallet_tokens(
+        self,
+        wallet_address: str,
+        offset: int = 0,
+        limit: int = 100,
+        listed_only: bool = True,
+    ) -> List[TokenMetadata]:
+        """
+        Retrieves tokens/NFTs owned by specified wallet address
+        :param wallet_address: Solana wallet address
+        :param offset: The number of items to skip
+        :param limit: The number of items to return. Max 500
+        :param listed_only: Determines if only listed tokens should be retrieved
+        :return: List of tokens/NFTS owned by specified wallet address
+        """
+        kwargs = {
+            "offset": offset,
+            "limit": limit,
+            "listedOnly": str(listed_only).lower(),
+        }
+        data = await self._request(route=f"wallets/{wallet_address}/tokens", **kwargs)
+        return Tokens.parse_obj(data).__root__
+
+    async def get_wallet_activities(
+        self, wallet_address: str, offset: int = 0, limit: int = 0
+    ) -> List[WalletActivityItem]:
+        """
+        Retrieves wallet activities
+        :param wallet_address: Solana wallet address
+        :param offset: The number of items to skip
+        :param limit: The number of items to return. Max 500
+        :return: List of wallet activities
+        """
+        kwargs = {
+            "offset": offset,
+            "limit": limit,
+        }
+        data = await self._request(
+            route=f"wallets/{wallet_address}/activities", **kwargs
+        )
+        return WalletActivities.parse_obj(data).__root__
+
+    async def get_wallet_offers_made(
+        self, wallet_address: str, offset: int = 0, limit: int = 100
+    ) -> List[WalletOfferMadeItem]:
+        """
+        Retrieves offers made by specified wallet
+        :param wallet_address: Solana wallet address
+        :param offset: The number of items to skip
+        :param limit: The number of items to return. Max 500
+        :return: List of offers made
+        """
+        kwargs = {
+            "offset": offset,
+            "limit": limit,
+        }
+        data = await self._request(
+            route=f"wallets/{wallet_address}/offers_made", **kwargs
+        )
+        return WalletOffersMade.parse_obj(data).__root__
+
+    async def get_wallet_offers_received(
+        self, wallet_address: str, offset: int = 0, limit: int = 0
+    ) -> List[WalletOfferReceivedItem]:
+        """
+        Retrieves offers received by a wallet
+        :param wallet_address: Solana wallet address
+        :param offset: The number of items to skip
+        :param limit: The number of items to return. Max 500
+        :return: List of offers received
+        """
+        kwargs = {
+            "offset": offset,
+            "limit": limit,
+        }
+        data = await self._request(
+            route=f"wallets/{wallet_address}/offers_received", **kwargs
+        )
+        return WalletOffersReceived.parse_obj(data).__root__
+
+    async def get_wallet_escrow_balance(self, wallet_address: str):
+        """
+        Retrieves escrow balance for wallet
+        :param wallet_address: Solana wallet address
+        :return: Wallet escrow balance
+        """
+        data = await self._request(route=f"wallets/{wallet_address}/escrow_balance")
+        return EscrowBalance(**data)
