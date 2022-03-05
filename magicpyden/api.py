@@ -1,11 +1,16 @@
-from email.mime import base
-from json import JSONDecodeError
-from asyncio import sleep
 from typing import Any, List
+
 from aiohttp import ClientResponse, ClientSession
 
-from magicpyden.exceptions import HttpException
-from magicpyden.schema import TokenListingItem, TokenListings, TokenMetadata
+from magicpyden.schema import (
+    TokenListingItem,
+    TokenListings,
+    TokenMetadata,
+    TokenOfferReceivedItem,
+    TokenOffersReceived,
+    TokenActivityItem,
+    TokenActivities,
+)
 
 
 class MagicEdenApi:
@@ -26,10 +31,49 @@ class MagicEdenApi:
             return await response.json()
 
     async def get_token_metadata(self, token_mint: str) -> TokenMetadata:
+        """
+        Retrieves token metadata by mint address
+        :param token_mint: Mint Address of token/NFT
+        :return: Token metadata
+        """
         data = await self._request(route=f"tokens/{token_mint}")
         return TokenMetadata(**data)
 
     async def get_token_listings(self, token_mint: str) -> List[TokenListingItem]:
+        """
+        Retrieves listings for specified token/NFT mint address
+        :param token_mint: Mint address of token/NFT
+        :return: List of token listings
+        """
         data = await self._request(route=f"tokens/{token_mint}/listings")
-        print(data)
         return TokenListings.parse_obj(data).__root__
+
+    async def get_token_offers_received(
+        self, token_mint: str, offset: int = 0, limit: int = 100
+    ) -> List[TokenOfferReceivedItem]:
+        """
+        Retrieves received offers for specified token/NFT mint address
+        :param token_mint: Mint address of token/NFT
+        :param offset: The number of items to skip
+        :param limit: The number of items to return. Max 500
+        :return: List of token offers received
+        """
+        kwargs = {"offset": offset, "limit": limit}
+        data = await self._request(
+            route=f"tokens/{token_mint}/offers_received", **kwargs
+        )
+        return TokenOffersReceived.parse_obj(data).__root__
+
+    async def get_token_activities(
+        self, token_mint: str, offset: int = 0, limit: int = 100
+    ) -> List[TokenActivityItem]:
+        """
+        Retrieves activities for specified token/NFT mint address
+        :param token_mint: Mint address of token/NFT
+        :param offset: The number of items to skip
+        :param limit: The number of items to return. Max 500
+        :return: List of activities for specified token/NFT
+        """
+        kwargs = {"offset": offset, "limit": limit}
+        data = await self._request(route=f"tokens/{token_mint}/activities", **kwargs)
+        return TokenActivities.parse_obj(data).__root__
