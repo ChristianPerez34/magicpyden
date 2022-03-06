@@ -3,9 +3,16 @@ from typing import Any, List
 from aiohttp import ClientResponse, ClientSession
 
 from magicpyden.schema import (
+    CollectionActivities,
+    CollectionActivityItem,
     CollectionItem,
+    CollectionListingItem,
+    CollectionListings,
+    CollectionStats,
     Collections,
     EscrowBalance,
+    LaunchPadCollections,
+    LaunchpadCollectionItem,
     TokenListingItem,
     TokenListings,
     TokenMetadata,
@@ -190,5 +197,61 @@ class MagicEdenApi:
             "offset": offset,
             "limit": limit,
         }
-        data = await self._request(route=f"collections", **kwargs)
+        data = await self._request(route="collections", **kwargs)
         return Collections.parse_obj(data).__root__
+
+    async def get_collection_listings(
+        self, collection_name: str, offset: int = 0, limit: int = 20
+    ) -> CollectionListingItem:
+        """
+        Retrieves tokens/NFT listings for collection
+        :param offset: The number of items to skip
+        :param limit: The number of items to return. Max 20
+        :return: List of listings for collection
+        """
+        kwargs = {
+            "offset": offset,
+            "limit": limit,
+        }
+        data = await self._request(
+            route=f"collections/{collection_name}/listings", **kwargs
+        )
+        return CollectionListings.parse_obj(data).__root__
+
+    async def get_collection_activities(
+        self, collection_name: str, offset: int = 0, limit: int = 100
+    ) -> List[CollectionActivityItem]:
+        """
+        Retrieves activities for collection
+        :param offset: The number of items to skip
+        :param limit: The number of items to return. Max 500
+        :return: List of activities for collection
+        """
+        kwargs = {
+            "offset": offset,
+            "limit": limit,
+        }
+        data = await self._request(
+            route=f"collections/{collection_name}/activities", **kwargs
+        )
+        return CollectionActivities.parse_obj(data).__root__
+
+    async def get_collection_stats(self, collection_name: str):
+        """
+        Retrieves stats for collection
+        :return: List of activities for collection
+        """
+        data = await self._request(
+            route=f"collections/{collection_name}/stats",
+        )
+        return CollectionStats(**data)
+
+    async def get_launchpad_collections(
+        self, offset: int = 0, limit: int = 200
+    ) -> List[LaunchpadCollectionItem]:
+        kwargs = {
+            "offset": offset,
+            "limit": limit,
+        }
+        data = await self._request(route="launchpad/collections", **kwargs)
+        return LaunchPadCollections.parse_obj(data).__root__

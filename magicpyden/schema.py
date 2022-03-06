@@ -153,8 +153,64 @@ class CollectionItem(BaseModel):
     twitter: Optional[str] = None
     discord: Optional[str] = None
     website: Optional[str] = None
-    categories: List[str]
+    categories: Optional[List[str]] = None
 
 
 class Collections(BaseModel):
     __root__: List[CollectionItem]
+
+
+class CollectionListingItem(BaseModel):
+    pda_address: str = Field(..., alias="pdaAddress")
+    auction_house: str = Field(..., alias="auctionHouse")
+    token_address: str = Field(..., alias="tokenAddress")
+    token_mint: str = Field(..., alias="tokenMint")
+    seller: str
+    token_size: int = Field(..., alias="tokenSize")
+    price: float
+
+
+class CollectionListings(BaseModel):
+    __root__: List[CollectionListingItem]
+
+
+class CollectionActivityItem(BaseModel):
+    signature: str
+    type: str
+    source: str
+    token_mint: str = Field(..., alias="tokenMint")
+    collection: str
+    slot: int
+    block_time: int = Field(..., alias="blockTime")
+    buyer: Optional[Optional[str]] = None
+    buyer_referral: str = Field(..., alias="buyerReferral")
+    seller: Optional[str]
+    seller_referral: str = Field(..., alias="sellerReferral")
+    price: float
+
+
+class CollectionActivities(BaseModel):
+    __root__: List[CollectionActivityItem]
+
+
+class CollectionStats(BaseModel):
+    symbol: str
+    floor_price: int = Field(..., alias="floorPrice")
+    listed_count: int = Field(..., alias="listedCount")
+    volume_all: int = Field(..., alias="volumeAll")
+
+
+class LaunchpadCollectionItem(BaseModel):
+    symbol: str
+    name: str
+    description: str
+    featured: Optional[bool] = None
+    edition: str
+    image: str
+    price: float
+    size: int
+    launch_datetime: str = Field(..., alias="launchDatetime")
+
+
+class LaunchPadCollections(BaseModel):
+    __root__: List[LaunchpadCollectionItem]
