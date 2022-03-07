@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
 from typing import List, Optional
+
+from pydantic import BaseModel, Field
 
 
 class Attribute(BaseModel):
@@ -100,9 +101,9 @@ class WalletActivityItem(BaseModel):
     collection: str
     slot: int
     block_time: int = Field(..., alias="blockTime")
-    buyer: str
+    buyer: Optional[str]
     buyer_referral: str = Field(..., alias="buyerReferral")
-    seller: str
+    seller: Optional[str]
     seller_referral: str = Field(..., alias="sellerReferral")
     price: float
 
@@ -141,7 +142,7 @@ class WalletOffersReceived(BaseModel):
 
 
 class EscrowBalance(BaseModel):
-    buyer_escrow: str
+    buyer_escrow: Optional[str]
     balance: float
 
 
@@ -153,7 +154,7 @@ class CollectionItem(BaseModel):
     twitter: Optional[str] = None
     discord: Optional[str] = None
     website: Optional[str] = None
-    categories: Optional[List[str]] = None
+    categories: Optional[List[Optional[str]]] = None
 
 
 class Collections(BaseModel):
@@ -205,11 +206,11 @@ class LaunchpadCollectionItem(BaseModel):
     name: str
     description: str
     featured: Optional[bool] = None
-    edition: str
+    edition: Optional[str] = None
     image: str
     price: float
     size: int
-    launch_datetime: str = Field(..., alias="launchDatetime")
+    launch_datetime: Optional[str] = Field(default=None, alias="launchDatetime")
 
 
 class LaunchPadCollections(BaseModel):
