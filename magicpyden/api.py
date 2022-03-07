@@ -119,7 +119,7 @@ class MagicEdenApi:
         return Tokens.parse_obj(data).__root__
 
     async def get_wallet_activities(
-        self, wallet_address: str, offset: int = 0, limit: int = 0
+        self, wallet_address: str, offset: int = 0, limit: int = 100
     ) -> List[WalletActivityItem]:
         """
         Retrieves wallet activities
@@ -157,7 +157,7 @@ class MagicEdenApi:
         return WalletOffersMade.parse_obj(data).__root__
 
     async def get_wallet_offers_received(
-        self, wallet_address: str, offset: int = 0, limit: int = 0
+        self, wallet_address: str, offset: int = 0, limit: int = 100
     ) -> List[WalletOfferReceivedItem]:
         """
         Retrieves offers received by a wallet
