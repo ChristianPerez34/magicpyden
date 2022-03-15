@@ -1,3 +1,4 @@
+from lib2to3.pytree import Base
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
@@ -24,16 +25,42 @@ class Properties(BaseModel):
     creators: List[Creator]
 
 
-class TokenMetadata(BaseModel):
+class Title(BaseModel):
+    name: str
+
+
+class Image(BaseModel):
+    image: str
+
+
+class Project(Title, Image):
+    description: str
+
+
+class Market(BaseModel):
+    price: float
+
+
+class Symbol(BaseModel):
+    symbol: str
+
+
+class Listing(BaseModel):
+    token_mint: str = Field(..., alias="tokenMint")
+    seller: Optional[str] = None
+
+
+class Collection(BaseModel):
+    collection: str
+
+
+class TokenMetadata(Collection, Title):
     mint_address: str = Field(..., alias="mintAddress")
     owner: str
     supply: int
-    collection: str
-    name: str
     update_authority: str = Field(..., alias="updateAuthority")
     primary_sale_happened: int = Field(..., alias="primarySaleHappened")
     seller_fee_basis_points: int = Field(..., alias="sellerFeeBasisPoints")
-    image: str
     animation_url: str = Field(..., alias="animationUrl")
     external_url: str = Field(..., alias="externalUrl")
     attributes: List[Attribute]
@@ -93,12 +120,11 @@ class TokenActivities(BaseModel):
     __root__: List[TokenActivityItem]
 
 
-class WalletActivityItem(BaseModel):
+class WalletActivityItem(Collection):
     signature: str
     type: str
     source: str
     token_mint: str = Field(..., alias="tokenMint")
-    collection: str
     slot: int
     block_time: int = Field(..., alias="blockTime")
     buyer: Optional[str]
@@ -146,11 +172,7 @@ class EscrowBalance(BaseModel):
     balance: float
 
 
-class CollectionItem(BaseModel):
-    symbol: str
-    name: str
-    description: str
-    image: str
+class CollectionItem(Project, Symbol):
     twitter: Optional[str] = None
     discord: Optional[str] = None
     website: Optional[str] = None
@@ -161,54 +183,41 @@ class Collections(BaseModel):
     __root__: List[CollectionItem]
 
 
-class CollectionListingItem(BaseModel):
+class CollectionListingItem(Listing):
     pda_address: str = Field(..., alias="pdaAddress")
     auction_house: str = Field(..., alias="auctionHouse")
     token_address: str = Field(..., alias="tokenAddress")
-    token_mint: str = Field(..., alias="tokenMint")
-    seller: str
     token_size: int = Field(..., alias="tokenSize")
-    price: float
 
 
 class CollectionListings(BaseModel):
     __root__: List[CollectionListingItem]
 
 
-class CollectionActivityItem(BaseModel):
+class CollectionActivityItem(Listing, Market, Collection):
     signature: str
     type: str
     source: str
-    token_mint: str = Field(..., alias="tokenMint")
-    collection: str
     slot: int
     block_time: int = Field(..., alias="blockTime")
     buyer: Optional[Optional[str]] = None
     buyer_referral: str = Field(..., alias="buyerReferral")
-    seller: Optional[str]
     seller_referral: str = Field(..., alias="sellerReferral")
-    price: float
 
 
 class CollectionActivities(BaseModel):
     __root__: List[CollectionActivityItem]
 
 
-class CollectionStats(BaseModel):
-    symbol: str
+class CollectionStats(Symbol):
     floor_price: int = Field(..., alias="floorPrice")
     listed_count: int = Field(..., alias="listedCount")
     volume_all: int = Field(..., alias="volumeAll")
 
 
-class LaunchpadCollectionItem(BaseModel):
-    symbol: str
-    name: str
-    description: str
+class LaunchpadCollectionItem(Project, Market, Symbol):
     featured: Optional[bool] = None
     edition: Optional[str] = None
-    image: str
-    price: float
     size: int
     launch_datetime: Optional[str] = Field(default=None, alias="launchDatetime")
 
