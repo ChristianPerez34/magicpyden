@@ -1,15 +1,16 @@
-from lib2to3.pytree import Base
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
+from magicpyden.types import Category
+
 
 class Attribute(BaseModel):
     trait_type: str
-    value: str
+    value: str  # noqa: WPS110
 
 
-class File(BaseModel):
+class File(BaseModel):  # noqa: WPS110
     uri: str
     type: str
 
@@ -21,7 +22,7 @@ class Creator(BaseModel):
 
 class Properties(BaseModel):
     files: List[File]
-    category: str
+    category: Optional[str] = None
     creators: List[Creator]
 
 
@@ -45,8 +46,11 @@ class Symbol(BaseModel):
     symbol: str
 
 
-class Listing(BaseModel):
+class MintAddress(BaseModel):
     token_mint: str = Field(..., alias="tokenMint")
+
+
+class Listing(BaseModel):
     seller: Optional[str] = None
 
 
@@ -61,8 +65,8 @@ class TokenMetadata(Collection, Title):
     update_authority: str = Field(..., alias="updateAuthority")
     primary_sale_happened: int = Field(..., alias="primarySaleHappened")
     seller_fee_basis_points: int = Field(..., alias="sellerFeeBasisPoints")
-    animation_url: str = Field(..., alias="animationUrl")
-    external_url: str = Field(..., alias="externalUrl")
+    animation_url: Optional[str] = Field(default=None, alias="animationUrl")
+    external_url: Optional[str] = Field(default=None, alias="externalUrl")
     attributes: List[Attribute]
     properties: Properties
     delegate: Optional[str] = None
@@ -72,13 +76,15 @@ class Tokens(BaseModel):
     __root__: List[TokenMetadata]
 
 
-class TokenListingItem(BaseModel):
+class ProgramDerivedAddress(BaseModel):
     pda_address: str = Field(..., alias="pdaAddress")
     auction_house: str = Field(..., alias="auctionHouse")
-    token_address: str = Field(..., alias="tokenAddress")
-    token_mint: str = Field(..., alias="tokenMint")
-    seller: str
     token_size: int = Field(..., alias="tokenSize")
+
+
+class TokenListingItem(MintAddress, ProgramDerivedAddress):
+    token_address: str = Field(..., alias="tokenAddress")
+    seller: str
     price: int
 
 
@@ -86,13 +92,12 @@ class TokenListings(BaseModel):
     __root__: List[TokenListingItem]
 
 
-class TokenOfferReceivedItem(BaseModel):
-    pda_address: str = Field(..., alias="pdaAddress")
-    token_mint: str = Field(..., alias="tokenMint")
-    auction_house: str = Field(..., alias="auctionHouse")
-    buyer: str
+class BuyerRefferal(BaseModel):
     buyer_referral: str = Field(..., alias="buyerReferral")
-    token_size: int = Field(..., alias="tokenSize")
+
+
+class TokenOfferReceivedItem(MintAddress, ProgramDerivedAddress):
+    buyer: str
     price: float
     expiry: int
 
@@ -101,15 +106,13 @@ class TokenOffersReceived(BaseModel):
     __root__: List[TokenOfferReceivedItem]
 
 
-class TokenActivityItem(BaseModel):
+class TokenActivityItem(MintAddress, BuyerRefferal):
     signature: str
     type: str
     source: str
-    token_mint: str = Field(..., alias="tokenMint")
     collection_symbol: str = Field(..., alias="collectionSymbol")
     slot: int
     block_time: int = Field(..., alias="blockTime")
-    buyer_referral: str = Field(..., alias="buyerReferral")
     seller: Optional[str] = None
     seller_referral: str = Field(..., alias="sellerReferral")
     price: float
@@ -120,15 +123,13 @@ class TokenActivities(BaseModel):
     __root__: List[TokenActivityItem]
 
 
-class WalletActivityItem(Collection):
+class WalletActivityItem(Collection, MintAddress, BuyerRefferal):
     signature: str
     type: str
     source: str
-    token_mint: str = Field(..., alias="tokenMint")
     slot: int
     block_time: int = Field(..., alias="blockTime")
     buyer: Optional[str]
-    buyer_referral: str = Field(..., alias="buyerReferral")
     seller: Optional[str]
     seller_referral: str = Field(..., alias="sellerReferral")
     price: float
@@ -138,28 +139,19 @@ class WalletActivities(BaseModel):
     __root__: List[WalletActivityItem]
 
 
-class WalletOfferMadeItem(BaseModel):
-    pda_address: str = Field(..., alias="pdaAddress")
-    token_mint: str = Field(..., alias="tokenMint")
-    auction_house: str = Field(..., alias="auctionHouse")
+class WalletOfferMadeItem(MintAddress, ProgramDerivedAddress, BuyerRefferal):
     buyer: str
     price: float
-    token_size: int = Field(..., alias="tokenSize")
     expiry: int
-    buyer_referral: Optional[str] = Field(None, alias="buyerReferral")
 
 
 class WalletOffersMade(BaseModel):
     __root__: List[WalletOfferMadeItem]
 
 
-class WalletOfferReceivedItem(BaseModel):
-    pda_address: str = Field(..., alias="pdaAddress")
-    token_mint: str = Field(..., alias="tokenMint")
-    auction_house: str = Field(..., alias="auctionHouse")
+class WalletOfferReceivedItem(MintAddress, ProgramDerivedAddress):
     buyer: str
     price: int
-    token_size: int = Field(..., alias="tokenSize")
     expiry: int
 
 
@@ -176,32 +168,30 @@ class CollectionItem(Project, Symbol):
     twitter: Optional[str] = None
     discord: Optional[str] = None
     website: Optional[str] = None
-    categories: Optional[List[Optional[str]]] = None
+    categories: Optional[List[Category]] = None
 
 
 class Collections(BaseModel):
     __root__: List[CollectionItem]
 
 
-class CollectionListingItem(Listing):
-    pda_address: str = Field(..., alias="pdaAddress")
-    auction_house: str = Field(..., alias="auctionHouse")
+class CollectionListingItem(Listing, ProgramDerivedAddress):
     token_address: str = Field(..., alias="tokenAddress")
-    token_size: int = Field(..., alias="tokenSize")
 
 
 class CollectionListings(BaseModel):
     __root__: List[CollectionListingItem]
 
 
-class CollectionActivityItem(Listing, Market, Collection):
+class CollectionActivityItem(  # noqa: WPS215
+    Listing, Market, Collection, BuyerRefferal
+):
     signature: str
     type: str
     source: str
     slot: int
     block_time: int = Field(..., alias="blockTime")
     buyer: Optional[Optional[str]] = None
-    buyer_referral: str = Field(..., alias="buyerReferral")
     seller_referral: str = Field(..., alias="sellerReferral")
 
 
