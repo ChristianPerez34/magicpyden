@@ -13,10 +13,6 @@ def event_loop():
     yield asyncio.get_event_loop()
 
 
-# def pytest_sessionfinish(session, exitstatus):
-#     asyncio.get_event_loop().close()
-
-
 @fixture
 async def fixture_api():
     await asyncio.sleep(0)
