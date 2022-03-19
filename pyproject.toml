@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "magicpyden"
-version = "0.1.0"
+version = "0.1.2"
 description = "Async Python API wrapper for MagicEden"
 authors = ["Christian Pérez Villanueva <perez.villanueva.christian34@gmail.com>"]
 
