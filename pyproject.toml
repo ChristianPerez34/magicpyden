@@ -1,8 +1,13 @@
 [tool.poetry]
 name = "magicpyden"
-version = "0.1.2"
+version = "0.1.4"
 description = "Async Python API wrapper for MagicEden"
+readme = "README.md"
+keywords = ["async", "api", "magic eden"]
 authors = ["Christian Pérez Villanueva <perez.villanueva.christian34@gmail.com>"]
+
+[project.urls]
+repository = "https://github.com/ChristianPerez34/magicpyden"
 
 [tool.poetry.dependencies]
 python = "^3.8"
