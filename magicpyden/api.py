@@ -302,7 +302,10 @@ class MagicEdenApi:
         """
         response: ClientResponse
 
-        kwargs = {camelize(key): value for key, value in kwargs.items()}  # noqa: WPS110
+        kwargs = {
+            camelize(key) if key not in ("offset", "limit") else key: value
+            for key, value in kwargs.items()  # noqa: WPS110
+        }
 
         async with self._session.get(
             url=f"{self._base_url}/{route}", params=kwargs

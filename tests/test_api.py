@@ -122,9 +122,15 @@ async def test_get_wallet_escrow_balance(fixture_api: MagicEdenApi):
 
 async def test_get_collections(fixture_api: MagicEdenApi):
     async with fixture_api as api:
-        collections = await api.get_collections()
+        offset, limit = 0, 200
+        collections = await api.get_collections(offset=offset, limit=limit)
+        collections_with_offset = await api.get_collections(
+            offset=offset + limit, limit=limit
+        )
 
-    assert isinstance(collections, list)
+        assert isinstance(collections, list)
+        assert isinstance(collections_with_offset, list)
+        assert collections != collections_with_offset
     await sleep(1)
 
 
