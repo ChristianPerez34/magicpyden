@@ -200,6 +200,7 @@ class CollectionActivities(BaseModel):
 
 
 class CollectionStats(Symbol):
+    avg_price_24hr: int = Field(..., alias="avgPrice24hr")
     floor_price: int = Field(..., alias="floorPrice")
     listed_count: int = Field(..., alias="listedCount")
     volume_all: int = Field(..., alias="volumeAll")
